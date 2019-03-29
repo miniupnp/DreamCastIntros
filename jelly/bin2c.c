@@ -41,9 +41,10 @@ int main(int argc, char **argv) {
 	argc--;
 	if (argc != 3) {
 		printf("usage: bin2c <input> <identifier> <output>\n");
-		return 0;
+		return 1;
 	}
 
 	convert(argv[1], argv[2], argv[3]);
+	return 0;
 }
 

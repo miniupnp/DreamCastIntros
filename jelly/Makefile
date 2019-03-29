@@ -1,6 +1,6 @@
 # Thomas Bernard
 CFLAGS = -Wall
 
-all:	Jellylink
+all:	Jellylink bin2c
 
 Jellylink:	Jellylink.o ../lzo/minilzo.o
