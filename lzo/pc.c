@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include "minilzo.h"
 #include "tetsuo2.h"
@@ -112,4 +113,3 @@ int main(int argc, char **argv)
 	return 0;
 
 }
-	
