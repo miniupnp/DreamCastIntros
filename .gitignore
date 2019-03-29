@@ -4,3 +4,6 @@ jelly/seek
 jelly/bin2c
 jelly/bmp2vmulcd
 jelly/test.bin*
+myintros/bin2shasm
+myintros/convertamigafont
+myintros/amiga.fnt

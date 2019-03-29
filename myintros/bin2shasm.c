@@ -2,6 +2,7 @@
 /* NaNaRd 2001 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define BUFFERSIZE 4096
 
