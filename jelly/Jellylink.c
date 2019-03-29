@@ -9,10 +9,10 @@
 #include <memory.h>
 #include <stdlib.h>
 
-#include "..\lzo\TETSUO2.H"
+#include "../lzo/TETSUO2.H"
 #define	TETSUO2_SIZE	0x189F
 #define	WHERE		0x1900
-#include "..\lzo\minilzo.h"
+#include "../lzo/minilzo.h"
 
 #define HEAP_ALLOC(var,size) \
         long __LZO_MMODEL var [ ((size) + (sizeof(long) - 1)) / sizeof(long) ]
@@ -121,7 +121,7 @@ int main(int argc, char ** argv) {
 	if(argc == 2)
 		inifile = fopen(argv[1], "r");
 	else
-		inifile = fopen("Jellytro.ini", "r");
+		inifile = fopen("jellytro.ini", "r");
 
 	if(inifile==NULL) {
 		fprintf(stderr,"Usage : %s [inifile]\n",argv[0]);
