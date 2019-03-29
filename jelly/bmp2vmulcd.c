@@ -13,6 +13,10 @@ int main(int arc, char *argv[]) {
 	unsigned char * p;
 	
 	fichier = fopen(argv[1],"rb");
+	if (fichier == NULL) {
+		fprintf(stderr, "failed to open %s\n", argv[1]);
+		return 1;
+	}
 	fread(buffer,1,318,fichier);
 	fclose(fichier);
 	

@@ -1,2 +1,6 @@
 *.o
 jelly/Jellylink
+jelly/seek
+jelly/bin2c
+jelly/bmp2vmulcd
+jelly/test.bin*

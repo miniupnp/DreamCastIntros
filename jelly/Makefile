@@ -1,7 +1,8 @@
 # Thomas Bernard
 CFLAGS = -Wall
 
-BINARIES = Jellylink bin2c seek
+BINARIES = Jellylink bin2c seek bmp2vmulcd
+
 all:	$(BINARIES)
 
 clean:
