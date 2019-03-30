@@ -9,7 +9,7 @@
 #include <memory.h>
 #include <stdlib.h>
 
-#include "../lzo/TETSUO2.H"
+#include "../lzo/tetsuo2.h"
 #define	TETSUO2_SIZE	0x189F
 #define	WHERE		0x1900
 #include "../lzo/minilzo.h"
