@@ -1,3 +1,6 @@
+BUILD_CC := $(CC)
+CFLAGS = -Wall
+
 AS = sh-elf-as -little
 LD = sh-elf-ld -EL
 CC = sh-elf-gcc -ml -m4-single-only -mhitachi -O2 -Wall
@@ -59,6 +62,9 @@ writechar.o : writechar.c
 TRlinker.exe : TRlinker.c TRdatas.h
 	cl TRlinker.c ..\lzo\minilzo.c
 	upx -9 TRlinker.exe
+
+TRlinker : TRlinker.c TRdatas.h ../lzo/minilzo.c
+	$(BUILD_CC) $(CFLAGS) -o $@ TRlinker.c ../lzo/minilzo.c
 
 clean :
 	del *.o

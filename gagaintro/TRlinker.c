@@ -9,10 +9,10 @@
 #include <memory.h>
 #include <stdlib.h>
 
-#include "..\lzo\TETSUO2.H"
+#include "../lzo/tetsuo2.h"
 #define	TETSUO2_SIZE	0x189F
 #define	WHERE		0x1900
-#include "..\lzo\minilzo.h"
+#include "../lzo/minilzo.h"
 
 #define HEAP_ALLOC(var,size) \
         long __LZO_MMODEL var [ ((size) + (sizeof(long) - 1)) / sizeof(long) ]
