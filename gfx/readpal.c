@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
 	char magic[4];
@@ -52,7 +53,7 @@ void rle_write(FILE * f, unsigned char * in, int n) {
 int main(int argc, char * argv[]) {
 	FILE * infile;
 	FILE * outfile;
-	char * buffer,* p;
+	unsigned char * buffer,* p;
 	int i;
 	unsigned short a;
 	unsigned short * pal16, *p2;
@@ -77,8 +78,13 @@ int main(int argc, char * argv[]) {
 	
 	fread(&header,10,1,infile);	// lis le header
 
+	// TODO : fix for bigendian machines (little endian is assumed)
 	printf("File %s opened. Magic : %c%c%c%c. Width : %d. Height : %d.\n",argv[1],header.magic[0],header.magic[1],header.magic[2],header.magic[3],header.x,header.y);
-	buffer = (char *)malloc(768+header.x*header.y);
+	buffer = (unsigned char *)malloc(768+header.x*header.y);
+	if (buffer == NULL) {
+		fprintf(stderr,"Memory allocation error\n");
+		exit(-1);
+	}
 
 	fread(buffer,768,1,infile);	// lis la palette
 
@@ -113,7 +119,7 @@ int main(int argc, char * argv[]) {
 	fprintf(outfile,"! palette 32bits\n");
 	p3 = pal32;
 	for(i=0;i<256;i++) {
-		fprintf(outfile,"\t.long 0x%x\n",*p3++);
+		fprintf(outfile,"\t.long 0x%lx\n",*p3++);
 	}
 	fclose(outfile);
 
