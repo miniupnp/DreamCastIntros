@@ -1,0 +1,34 @@
+    The Trainer Menu for DC by volkor : Quick doc.
+    ----------------------------------------------
+
+# What you've got in the package is :
+
+Trainer.bin     : The trainer executable in the "release" version
+TrainerGD.bin   : The Trainer executable in the "test" version
+TRlinker.exe    : The linker !
+*.s3m           : Some music for the menu...
+*.ini           : Some .ini example.
+Trainor_doc.txt : hu?
+description.txt : An example file of a text to be displayed in the 1st screen
+                  of the trainer. The text is limited to 16 lines of 23 chars.
+
+# How to add the trainer to a game :
+
+Find the Cheats for the game, then make a .ini (just copy and modify one
+provided for example). The order of the options within the .ini is important.
+The text for the scrolltext should be on only one line. You must numerotate
+the options from 1 to "TR_noptions". Every option have 3 lines :
+option n
+Menu text (34 chars max)
+One line with the cheat itself. 1st number is the size of the cheat code.
+
+Run "TRlinker something.ini" from a windows command line. You should see
+something like that :
+"Operation sucessfull. 888888 bytes written to patched_game.bin"
+Now the packer and padder is included so the file "patched_game.bin.lzo" will
+be the good one.
+
+# notes :
+
+You can link the menu with the .s3m you like. But the Player is very buggy !
+So be carefull !
