@@ -103,8 +103,8 @@ int main(int argc, char ** argv) {
 	FILE * text;
 	char textname[256];
 	char * buffer;
-	char * big_buffer;
-	char * big_buffer2;
+	unsigned char * big_buffer;
+	unsigned char * big_buffer2;
 	char * inibuffer;
 	char ligne[80];
 	char * textbuffer;
@@ -201,7 +201,7 @@ int main(int argc, char ** argv) {
 	fseek(game, 0, SEEK_END);
 	gamesize = ftell(game);
 	rewind(game);
-	printf("Size of %s : %d bytes.\n",gamename,gamesize);
+	printf("Size of %s : %lu bytes.\n",gamename,gamesize);
 
 	music = fopen(musicname,"rb");
 	if(music == NULL) {
@@ -212,7 +212,7 @@ int main(int argc, char ** argv) {
 	fseek(music, 0, SEEK_END);
 	musicsize = ftell(music);
 	rewind(music);
-	printf("Size of %s : %d bytes.\n",musicname,musicsize);
+	printf("Size of %s : %lu bytes.\n",musicname,musicsize);
 
 	out = fopen(outname,"wb");
 	if(out == NULL) {
@@ -252,7 +252,7 @@ int main(int argc, char ** argv) {
 	}
 	textbuffer[textsize++] = 0;
 	
-	printf("\nText (length %d) :\n%s-----------------------\n",textsize,textbuffer);
+	printf("\nText (length %lu) :\n%s-----------------------\n",textsize,textbuffer);
 	
 	fclose(text);
 
@@ -278,7 +278,7 @@ int main(int argc, char ** argv) {
 	strcat(buffer,inibuffer);
 	TR.TR_scroll_text_lenght = strlen(buffer)-1;
 	p += TR.TR_scroll_text_lenght; p = (p+3) & ~3;
-	printf("\nScroll text (length %d) :\n%s\n", TR.TR_scroll_text_lenght, buffer);
+	printf("\nScroll text (length %lu) :\n%s\n", TR.TR_scroll_text_lenght, buffer);
 	TR.TR_scroll_text = (char *)(0x8c010000+TR_datas_base+sizeof(TR_datas));
 
 	/* met le texte ou il faut */
@@ -322,15 +322,15 @@ int main(int argc, char ** argv) {
 		write_little((buffer+p), n);
 		p += 4;
 		for(j=0; j<n; j++) {
-			fscanf(inifile,"%x",&x);
-			printf("0x%.8x ",x);
+			fscanf(inifile,"%lx",&x);
+			printf("0x%.8lx ",x);
 			write_little((buffer+p), x);
 			p += 4;
 		}
 		printf("\n\t----------------------------------\n");
 	}
 
-	TR.TR_txts = (unsigned char * *)(0x8c010000+TR_datas_base+sizeof(TR_datas)+p);
+	TR.TR_txts = (char * *)(0x8c010000+TR_datas_base+sizeof(TR_datas)+p);
 	TR.TR_cheats = (unsigned long * *)(0x8c010000+TR_datas_base+sizeof(TR_datas)+p+noptions*sizeof(char *));
 
 	q = p + noptions*(sizeof(unsigned long *)+sizeof(char *));
@@ -353,7 +353,7 @@ int main(int argc, char ** argv) {
 	out_count += gamesize;
 
 	/* C la fin :) */
-	printf("Operation sucessfull. %d bytes written to %s.\n", out_count, outname);
+	printf("Operation sucessfull. %lu bytes written to %s.\n", out_count, outname);
 
 	fclose(inifile);
 	fclose(out);
@@ -370,8 +370,8 @@ int main(int argc, char ** argv) {
 	strcpy(outlzoname, outname);
 	strcat(outlzoname,".lzo");
 	outlzo = fopen(outlzoname,"wb");
-	big_buffer = (char*)malloc(out_count);
-	big_buffer2 = (char*)malloc(2*out_count);
+	big_buffer = (unsigned char*)malloc(out_count);
+	big_buffer2 = (unsigned char*)malloc(2*out_count);
 	if((big_buffer == NULL)||(big_buffer2 == NULL)) {
 		fprintf(stderr,"Error allocating memory.\n");
 		exit(57);
@@ -385,7 +385,7 @@ int main(int argc, char ** argv) {
 	r = lzo1x_1_compress(big_buffer,out_count,big_buffer2,&clength,wrkmem);
 
 	if(r == LZO_E_OK)
-		printf("Packed %lu bytes to %lu bytes (%g%%).\n",out_count,clength,(100.0*clength)/out_count);
+		printf("Packed %lu bytes to %u bytes (%g%%).\n",out_count,clength,(100.0*clength)/out_count);
 	else {
 		fprintf(stderr,"Error during LZO Compression.\n");
 		exit(58);
