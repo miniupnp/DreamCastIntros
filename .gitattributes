@@ -17,7 +17,9 @@
 *.bin binary
 *.png binary
 *.gif binary
+*.GIF binary
 *.bmp binary
 *.sc? binary
+*.SC? binary
 *.ico binary
 *.s3m binary
