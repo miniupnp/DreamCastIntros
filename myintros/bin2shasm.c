@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 	    		break;
 	    	default: tmp = 666;	/* pour detecter les erreurs */
 	    }
-	    fprintf(outfile, "\t%s %u\n", word_types[word_type], tmp);
+	    fprintf(outfile, "\t%s %lu\n", word_types[word_type], tmp);
 	  }
 	}
 		

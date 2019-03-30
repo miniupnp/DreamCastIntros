@@ -50,11 +50,11 @@ int main(int argc, char **argv)
                                 e988df88cnt++;
                                 if(*(ptr+1+j+3)==0x8B) {
                                     e988df888bcnt++;
-                                    printf("maybe found at %X\n",0x8c010000+i+1+j);
+                                    printf("maybe found at %lX\n",0x8c010000+i+1+j);
                                     if(*(ptr-1)==0xE4) {
                                         for(k=0;k<6;k+=2) {
                                             if(*(ptr-k)==0x0B) {
-                                            printf("sure found at %X\n",0x8c010000+i+1+j);
+                                            printf("sure found at %lX\n",0x8c010000+i+1+j);
                                             printf("%0X %0X %0X %0X %0X %0X \n%0X %0X %0X %0X %0X %0X %0X %0X %0X %0X %0X %0X\n"
                                             ,*(ptr-6),*(ptr-5)
                                             ,*(ptr-4),*(ptr-3),*(ptr-2),*(ptr-1)
