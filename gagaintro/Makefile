@@ -1,15 +1,31 @@
 BUILD_CC := $(CC)
 CFLAGS = -Wall
 
+ifdef ComSpec
+# sometimes, it is ComSpec, sometimes it is COMSPEC
+COMSPEC = $(ComSpec)
+endif
+
+ifdef COMSPEC
+# Win32
+TRLINKER = TRlinker.exe
+RM = del
+else
+TRLINKER = TRlinker
+endif
+
 AS = sh-elf-as -little
 LD = sh-elf-ld -EL
 CC = sh-elf-gcc -ml -m4-single-only -mhitachi -O2 -Wall
 
-OBJS = crt0.o ..\myintros\fmath.o ..\myintros\dc.o amiga.fnt.o maple.o memory.o affpal.o spu.o writechar.o TR_install.o TR_reloc.o TRdatas.o
+OBJS = crt0.o ../myintros/fmath.o ../myintros/dc.o \
+	amiga.fnt.o maple.o memory.o affpal.o spu.o writechar.o \
+	TR_install.o TR_reloc.o TRdatas.o
 
-DISTRIBFILES = Trainer.bin TrainerGD.bin nothing.bin TRlinker.exe dtc*.ini Trainor_doc.txt description.txt
+DISTRIBFILES = Trainer.bin TrainerGD.bin nothing.bin $(TRLINKER) \
+	 dtc*.ini Trainor_doc.txt description.txt
 
-all : Trainer.elf Trainer.bin TRlinker.exe TrainerGD.elf TrainerGD.bin nothing.bin
+all : Trainer.elf Trainer.bin $(TRLINKER) TrainerGD.elf TrainerGD.bin nothing.bin
 
 Trainer.elf : $(OBJS) maple.h intro.o
 	$(CC) -o $@ -Wl,-Ttext,0x8c010000 \
@@ -67,10 +83,11 @@ TRlinker : TRlinker.c TRdatas.h ../lzo/minilzo.c
 	$(BUILD_CC) $(CFLAGS) -o $@ TRlinker.c ../lzo/minilzo.c
 
 clean :
-	del *.o
-	del *.obj
-	del *.elf
-	del TRlinker.exe
+	$(RM) *.o
+	$(RM) *.obj
+	$(RM) *.elf
+	$(RM) TRlinker.exe
+	$(RM) TRlinker
 
 distrib : $(DISTRIBFILES)
 	zip Trainor_volkor.zip $(DISTRIBFILES)
