@@ -1,0 +1,33 @@
+README for S3MPlay (version 1.0)
+
+This is a work in progress. The player is distributed under the MIT
+licensing terms. Basically they say that you can do whatever you want
+to with this, as long as you don't change it and then distribute it
+saying that it's the same library (i.e., you claim it's the original
+"s3mplay") or that you change it and say that you wrote it. Additionally,
+there is NO WARRANTY on the program or its functionality.
+
+This program plays S3M module files (like from PC demos) using the processing
+power of the AICA CPU core. Basically you just turn off the AICA CPU,
+load your S3M into 0xa0810000, then load this program at 0xa0800000, and
+turn on the AICA CPU. After a few seconds you ought to hear your song coming
+out of the Dreamcast.
+
+The player still has some bugs in it, but I think that the sound code itself
+is pretty much golden. =)
+
+If you'd like to change and recompile it, you'll need the GNU toolchain
+built for ARM7. Specifically you'll need GCC and AS. These can be built in
+exactly the same way you built the SH4 toolchain -- just follow the
+directions on the Hitmen page except use these configure lines:
+
+../binutils-2.10/configure --target=arm-elf --prefix=$prefix
+../gcc-2.95.2/configure --target=arm-elf --prefix=$prefix --without-headers
+	--without-libs
+
+That ought to do it for you. I have included the aica_fw.h that has the
+precompiled version though.
+
+					Dan Potter
+					Aug 23, 2000
+					http://www.allusion.net/dcdev/
