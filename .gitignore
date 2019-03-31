@@ -8,3 +8,8 @@ myintros/bin2shasm
 myintros/convertamigafont
 myintros/amiga.fnt
 lzo/tetsuo
+gfx/readpal
+gfx/*.binimg
+gfx/*.pal
+gfx/*.pal32
+gfx/*.rleimg
