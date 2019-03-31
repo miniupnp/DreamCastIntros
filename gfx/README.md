@@ -3,7 +3,7 @@ a .SC? (.SCI, .SCX, .SCF, etc.) file.
 The input format is known as the ColoRIX VGA Paint format. It is supported
 by [GrafX2](http://grafx2.tk/) which I used at the time to convert my files.
 
-$ readpal file.sci
+`$ readpal file.sci`
 outputs :
 - file.sci.pal :    RGB565 palette (gnu asm format)
 - file.sci.pal32 :  RGB888 palette (gnu asm format)
