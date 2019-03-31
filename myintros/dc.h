@@ -27,7 +27,7 @@ extern int	dc_check_cable(void);
 // coded by Marcus
 extern void	dc_init_video(int, int);
 // arg1:	cable type from dc_check_cable
-// arg2:	mode, 0=RGB555, 1=RGB565 3=RGB888
+// arg2:	mode, 0=RGB555, 1=RGB565, 2=RGB888(24bpp), 3=RGB888(32bpp)
 extern void	dc_init_video320(int, int);
 
 // coded by Marcus

@@ -121,58 +121,64 @@ pctra_set:
 	!	has set up reasonable defaults for syncs etc.
 	
 	! r4 = cabletype (0=VGA, 2=RGB, 3=Composite)
-	! r5 = pixel mode (0=RGB555, 1=RGB565, 3=RGB888)
+	! r5 = pixel mode (0=RGB555, 1=RGB565, 2=RGB888 24b, 3=RGB888 32b)
 
 _dc_init_video320:
 
 	! Look up bytes per pixel as shift value
 	mov	#3,r1
-	and	r5,r1
+	and	r5,r1	! r1 = pixel mode
 	mova	bppshifttab,r0
-	mov.b	@(r0,r1),r5
+	mov.b	@(r0,r1),r5	! r5 = 1 for 16bpp, 2 for 32bpp (0 for 24bpp)
 	! Get video HW address
 	mov.l	videobase,r0
 	mov	#0,r2
-	mov.l	r2,@(8,r0)
-	add	#0x40,r0
+	mov.l	r2,@(8,r0)	! write 0 to 0xa05f8008
+	add	#0x40,r0		! r0 = 0xa05f8040
 	! Set border colour
-	mov	#0,r2
+	mov	#0,r2			! black
 	mov.l	r2,@r0
 	! Set pixel clock and colour mode
 	shll2	r1
 	mov	#240/2,r3	! Non-VGA screen has 240 display lines
 !	shll	r3
 	shll2	r3		! pour le 240 lignes... pourquoi ? bonne question
+	! r3 = 480
 	mov	#2,r2
 	tst	r2,r4
 	bf/s	khz15_
-	add	#1,r1
+	add	#1,r1		! set bit0 = Display Enable
+	! VGA
 !	shll	r3		! Double # of display lines for VGA
-	! Set double pixel clock
+	! Set double pixel clock (31KHz for VGA)
 	mov	#1,r2
 	rotr	r2
 	shlr8	r2
-	or	r2,r1
+	or	r2,r1		! set bit23 = Clock double enable
+	! setting bit1 would enable "Scan Double" which makes
+	! all lines displayed twice, allowing 240 line VGA mode in 60Hz
 khz15_:	
-	mov.l	r1,@(4,r0)
+	mov.l	r1,@(4,r0)	! write r1 to 0xa05f8044
 	! Set video base address
-	mov	#0,r1
-	mov.l	r1,@(0x10,r0)
+	mov	#0,r1		! for non-interlaced and long field of interlaced screens
+	mov.l	r1,@(0x10,r0)	! 0xa05f8050 (Video memory base offset 1)
 	! Video base address for short fields should be offset by one line
 	mov	#640/16,r1	! ?
 !mov	#320/16,r1
 	shll2	r1
-	shll2	r1
-	shld	r5,r1
-	mov.l	r1,@(0x14,r0)
+	shll2	r1		! r1 = 320
+	shld	r5,r1	! r1 = 640 for 16bpp, 1280 for 32bpp (should be 960 for 24bpp)
+	mov.l	r1,@(0x14,r0)	! 0xa05f8054 (Video memory base offset 2)
+	! for short fields of interlaced screens
+
 	! Set screen size and modulo, and interlace flag
 	mov.l	r4,@-r15
 	mov	#1,r2
 	shll8	r2
 !	mov	#640/16,r1
 	mov	#320/16,r1	! pour le 320
-	shll2	r1
-	shld	r5,r1
+	shll2	r1	! r1 = 320/4
+	shld	r5,r1	! r1 = 160 for 16bpp, 320 for 32bpp (should be 240 for 24bpp)
 				! avec 240 lignes ya jamais d'interlace !
 !	mov	#2,r5
 !	tst	r5,r4
@@ -181,44 +187,44 @@ khz15_:
 !	add	r1,r4		! add one line to offset => display every other line
 !	add	#0x50,r2	! enable LACE
 !nonlace_:
-mov	#1,r4
+mov	#1,r4		! Modulo value : number of longs to skip between each line +1
+	shll8	r4	! a value of 1 means the lines are stored consecutively in memory
+	shll2	r4	! r4 = (1 << 10)
+	add	r3,r4	! lines per field -1
+	add	#-1,r4	! r4 += 480-1
 	shll8	r4
 	shll2	r4
-	add	r3,r4
-	add	#-1,r4
-	shll8	r4
-	shll2	r4
-	add	r1,r4
-	add	#-1,r4
+	add	r1,r4	! long words per line-1
+	add	#-1,r4	! r4 = (r4 << 10) + (r1 - 1)
 !mov.l	valueDTC2,r4	!nnd !!!!!!! (triche :)
-	mov.l	r4,@(0x1c,r0)
+	mov.l	r4,@(0x1c,r0)	! 0xa05f805c
 	mov.l	@r15+,r4
-	add	#0x7c,r0
-	mov.l	r2,@(0x14,r0)
+	add	#0x7c,r0		! r0 = 0xa05f80bc
+	mov.l	r2,@(0x14,r0)	! write to 0xa05f80d0
 	! Set vertical pos and border
 	mov	#24,r1
-	mov	r1,r2
-	shll16	r1
+	mov	r1,r2		! lower 16bits are for short fields of interlaced
+	shll16	r1		! upper 16bits are for non-interlaced or long fields
 	or	r2,r1
-	mov.l	r1,@(0x34,r0)
+	mov.l	r1,@(0x34,r0)	! write to 0xa05f80f0 (display vertical position)
 	add	r3,r1
-	mov.l	r1,@(0x20,r0)
+	mov.l	r1,@(0x20,r0)	! write to 0xa05f80dc (vertical border range)
 	! Horizontal pos
-	mov.w	hpos,r1
-	mov.l	r1,@(0x30,r0)
+	mov.w	hpos,r1			! r1 = 0xaa = 170
+	mov.l	r1,@(0x30,r0)	! write to 0xa05f80ec (display horizontal position)
 
-	mov.l	valueDTC,r1		!nnd
-	mov.l	r1,@(0x1c,r0)		!nnd
-	mov.l	@(0x2c,r0),r1		!nnd
+	mov.l	valueDTC,r1		! r1 = 0x01060359. vertical=0x106=262 Horizontal=0x359=857
+	mov.l	r1,@(0x1c,r0)	! 0xa05f80d8 (Full video size)
+	mov.l	@(0x2c,r0),r1	! 0xa05f80e8 (Additional video settings)
 	mov	#1,r2			!nnd
 	shll8	r2			!nnd
-	or	r2,r1			!nnd
-	mov.l	r1,@(0x2c,r0)		!nnd
+	or	r2,r1			! r1 = *(0xa05f80e8) | (1 << 8)
+	mov.l	r1,@(0x2c,r0)	! set Low-res bit to enable 320 pixel horizontal resolution
 	
 	! Select RGB/CVBS
 	mov.l	cvbsbase,r1
 	rotr	r4
-	bf/s	rgbmode_
+	bf/s	rgbmode_	! test bit0 of r4
 	mov	#0,r0
 	mov	#3,r0
 rgbmode_:
@@ -254,42 +260,42 @@ _dc_init_video:
 	mov.l	videobase,r0
 	mov	#0,r2
 	mov.l	r2,@(8,r0)
-	add	#0x40,r0
+	add	#0x40,r0	! r0 = 0xa05f8040
 	! Set border colour
 	mov	#0,r2
 	mov.l	r2,@r0
 	! Set pixel clock and colour mode
 	shll2	r1
 	mov	#240/2,r3	! Non-VGA screen has 240 display lines
-	shll	r3
+	shll	r3	! r3 = 240
 	mov	#2,r2
 	tst	r2,r4
 	bf/s	khz15
-	add	#1,r1
-	shll	r3		! Double # of display lines for VGA
+	add	#1,r1		! set Display Enable bit
+	shll	r3		! Double # of display lines for VGA : r3 = 480
 	! Set double pixel clock
 	mov	#1,r2
 	rotr	r2
 	shlr8	r2
-	or	r2,r1
+	or	r2,r1	! r1 |= (1 << 23)
 khz15:	
-	mov.l	r1,@(4,r0)
+	mov.l	r1,@(4,r0)	! 0xa05f8044 Display mode
 	! Set video base address
 	mov	#0,r1
-	mov.l	r1,@(0x10,r0)
+	mov.l	r1,@(0x10,r0)	! 0xa05f8050 Video memory base offset 1
 	! Video base address for short fields should be offset by one line
 	mov	#640/16,r1
 	shll2	r1
 	shll2	r1
 	shld	r5,r1
-	mov.l	r1,@(0x14,r0)
+	mov.l	r1,@(0x14,r0)	! 0xa05f8054 Video memory base offset 2
 	! Set screen size and modulo, and interlace flag
 	mov.l	r4,@-r15
 	mov	#1,r2
-	shll8	r2
+	shll8	r2	! (1 << 8) video output enable bit
 	mov	#640/16,r1
-	shll2	r1
-	shld	r5,r1
+	shll2	r1	! r1 = 160
+	shld	r5,r1	! r1 = 320 for 16bpp, 640 for 32bpp (should be 480 for 24bpp)
 	mov	#2,r5
 	tst	r5,r4
 	bt/s	nonlace	! VGA => no interlace
@@ -299,27 +305,27 @@ khz15:
 nonlace:
 	shll8	r4
 	shll2	r4
-	add	r3,r4
-	add	#-1,r4
+	add	r3,r4	! lines per field
+	add	#-1,r4	! r4 += 240-1 for 15KHz, 480-1 for VGA (31KHz)
 	shll8	r4
 	shll2	r4
 	add	r1,r4
 	add	#-1,r4
-	mov.l	r4,@(0x1c,r0)
+	mov.l	r4,@(0x1c,r0)	! 0xa05f805c Display mode and modulo
 	mov.l	@r15+,r4
-	add	#0x7c,r0
-	mov.l	r2,@(0x14,r0)
+	add	#0x7c,r0	! r0 = 0xa05f80bc
+	mov.l	r2,@(0x14,r0)	! 0xa05f80d0 Video encapsulation
 	! Set vertical pos and border
 	mov	#24,r1
 	mov	r1,r2
 	shll16	r1
 	or	r2,r1
-	mov.l	r1,@(0x34,r0)
-	add	r3,r1
-	mov.l	r1,@(0x20,r0)
+	mov.l	r1,@(0x34,r0)	! 0xa05f80f0 display vertical position
+	add	r3,r1	! upper 16bits=start, lower 16bits=stop=(start + number of lines)
+	mov.l	r1,@(0x20,r0)	! 0xa05f80dc Border vertical range
 	! Horizontal pos
-	mov.w	hpos,r1
-	mov.l	r1,@(0x30,r0)
+	mov.w	hpos,r1	! r1 = 0xaa = 170
+	mov.l	r1,@(0x30,r0)	! 0xa05f80ec Display horizontal position
 	
 	! Select RGB/CVBS
 	mov.l	cvbsbase,r1
