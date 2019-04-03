@@ -16,6 +16,3 @@ The RLE stream is very simple :
 - any byte value X >= 128 means repeat (X - 128) times the next byte
 
 This algorithm is very inefficient for pictures with more than 128 colors.
-
-
-TODO : readpal will currently only works on Little-Endian machines

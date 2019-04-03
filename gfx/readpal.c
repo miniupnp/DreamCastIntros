@@ -11,8 +11,17 @@ typedef struct {
 	char magic[4];
 	short x;
 	short y;
-	short z;
+	unsigned char palette_type;
+	unsigned char storage_type;
 	} SCx_header;
+
+/* read a short integer (16bits) from a little endian file */
+static short readshort(FILE * f) {
+	short val;
+	val = (short)fgetc(f);
+	val |= (short)getc(f) << 8;
+	return val;
+}
 
 /* Format RLE a la con ! */
 /* Si octet < 128 => brut
@@ -76,9 +85,12 @@ int main(int argc, char * argv[]) {
 	pal16 = (unsigned short *)malloc(256*2);
 	pal32 = (unsigned long *)malloc(256*4);
 	
-	fread(&header,10,1,infile);	// lis le header
+	fread(header.magic,4,1,infile);	// lis le header
+	header.x = readshort(infile);
+	header.y = readshort(infile);
+	header.palette_type = (unsigned char)fgetc(infile);
+	header.storage_type = (unsigned char)fgetc(infile);
 
-	// TODO : fix for bigendian machines (little endian is assumed)
 	printf("File %s opened. Magic : %c%c%c%c. Width : %d. Height : %d.\n",argv[1],header.magic[0],header.magic[1],header.magic[2],header.magic[3],header.x,header.y);
 	buffer = (unsigned char *)malloc(768+header.x*header.y);
 	if (buffer == NULL) {
